@@ -13,6 +13,11 @@ import java.awt.event.WindowEvent;
  * @version: 1.0
  */
 public class ClientFrame extends Frame{
+
+    public static final ClientFrame INSTANCE = new ClientFrame();
+
+
+    Client c = null;
     TextArea ta = new TextArea();
     TextField tf = new TextField();
 
@@ -24,21 +29,35 @@ public class ClientFrame extends Frame{
         tf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                ta.setText(ta.getText() + tf.getText());
+                c.send(tf.getText());
+                //ta.setText(ta.getText() + tf.getText());
                 tf.setText("");
             }
         });
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                c.closeConnect();
                 System.exit(0);
             }
         });
         this.setVisible(true);
+        //connecttoserver();这儿做成单例以后，就不要在初始化的时候连接了
+    }
+
+    private void connecttoserver() {
+        c = new Client();
+        c.connect();
     }
 
 
     public static void main(String[] args) {
-        new ClientFrame();
+        ClientFrame frame = ClientFrame.INSTANCE;
+        frame.setVisible(true);
+        frame.connecttoserver();
+    }
+
+    public void updateText(String msgAccepted) {
+        ta.setText(ta.getText()+System.getProperty("line.separator")+msgAccepted);
     }
 }
